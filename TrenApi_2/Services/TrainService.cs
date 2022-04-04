@@ -13,16 +13,16 @@ public static class TrainService
         _vagonsDogu = new List<Carriage>
         {
             new Carriage { Id= 1, Capacity = 100, Occupancy = 80},
-            new Carriage { Id= 2, Capacity = 90, Occupancy = 70},
-            new Carriage{ Id= 3, Capacity = 80, Occupancy = 50},
-            new Carriage{ Id= 4, Capacity = 120, Occupancy = 100}
+            new Carriage { Id= 2, Capacity = 90, Occupancy = 40},
+            new Carriage{ Id= 3, Capacity = 80, Occupancy = 20},
+            new Carriage{ Id= 4, Capacity = 120, Occupancy = 30}
         };
         _vagonsBaskent = new List<Carriage>
         {
-            new Carriage { Id= 1, Capacity = 90, Occupancy = 70},
-            new Carriage { Id= 2, Capacity = 120, Occupancy = 96},
-            new Carriage{ Id= 3, Capacity = 70, Occupancy = 50},
-            new Carriage{ Id= 4, Capacity = 120, Occupancy = 100}
+            new Carriage { Id= 1, Capacity = 90, Occupancy = 40},
+            new Carriage { Id= 2, Capacity = 120, Occupancy = 20},
+            new Carriage{ Id= 3, Capacity = 70, Occupancy = 0},
+            new Carriage{ Id= 4, Capacity = 120, Occupancy = 0}
         };
         Trains = new List<Train>
         {
@@ -41,13 +41,76 @@ public static class TrainService
         train.Id = nextId++;
         Trains.Add(train);
     }
+    //Merhaba ben Mert,
+    /*  Proje dökümanında  "KisilerFarkliVagonlaraYerlestirilebilir"(Bu parametreyi "together" olarak tanımlayıp projede ters uyguladım) parametresi true(false) verildiğinde 
+    ve vagonların toplamında "RezervasyonYapilacakKisiSayisi" parametresi kadar yer olmadığında boş liste döndürmesi şeklinde bir programlama isteniyor gibi görünüyordu.
+    Bu kullanıcının sürekli uygun koltuk sayısını bulana kadar deneme yapmasını gerektireceğinden, bu gibi bir durumda, hangi vagonda kaç uygun koltuk varsa, buna uygun
+    şekilde bir liste döndürmesi için programladım.
+    Sonuç olarak patronlar boş koltukları sevmez. :)
+        Proje için birkaç gün vakit ayırmam gerekti. Bunun sebebi daha önce API yazmamış olmamdı. Yeteri kadar ilgilenmediğimi düşünmenizi istemem. Yazarken 
+    Microsoft dökümanları ve notlarımdan faydalandım. Bundan önce yazmış olduğum, OOP repositorisinin altındaki _PiggyBank projesini de incelemeniz beni mutlu eder.
+    Çok yararlı birkaç gün geçirdim. Bunun için de ayrıca teşekkür ederim. 
+    İyi çalışmalar dilerim. */
 
-    public static void CheckReservation(Train train, bool together)
+    public static List<Detail> CheckReservation(int id, int person, bool together)
     {
+        List<Detail> _yerlesim = new List<Detail>();
+        int _person = person;
+        var train = Get(id);
+        Detail detail;
+
         if (together == true)
-        {
-            return;
+        { 
+            foreach (Carriage item in train.Carriages)
+            {
+                if (item.Occupancy + person <= (item.Capacity*0.70))
+                {
+                    detail = new Detail()
+                    {
+                        carriage = item.ToString(),
+                        PersonCount = person,
+                        RezOk = true
+
+                    };
+                    _yerlesim.Add(detail);
+                    break;
+                }
+            }
         }
+        else
+        {
+            if (_person > 0)
+            {
+                double suitable = 0;
+                foreach (var item in train.Carriages)
+                {
+                    suitable = (item.Capacity * 0.70) - item.Occupancy;
+                    if (_person > suitable && suitable > 0)
+                    {
+                        detail = new Detail()
+                        {
+                            carriage =item.ToString(),
+                            PersonCount = (int)suitable,
+                            RezOk = true
+                        };
+                        _yerlesim.Add(detail);
+                        _person = _person - (int)suitable;
+                    }
+                    else if (_person <= suitable && _person > 0)
+                     {
+                        detail = new Detail()
+                        {
+                            carriage=item.ToString(),
+                            PersonCount= _person,
+                            RezOk = true
+                        };
+                        _yerlesim.Add(detail);
+                        _person = 0;
+                    }
+                }
+            }
+        }
+        return _yerlesim;
     }
 
     public static void Delete(int id)
@@ -61,4 +124,5 @@ public static class TrainService
         }
     }
 }
+
 

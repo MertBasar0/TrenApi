@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using TrenApi_2.Models;
 using TrenApi_2.Services;
 
@@ -31,6 +31,12 @@ public class TrainController : ControllerBase
             return train;
         }
     }
+
+    [HttpGet("{id},{person},{together}")]
+
+    public ActionResult<List<Detail>> CheckReservation(int id, int person, bool together) => TrainService.CheckReservation(id, person, together);
+
+
 
     [HttpPost]
     public IActionResult Create(Train train)
