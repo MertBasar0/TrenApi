@@ -7,7 +7,7 @@ public static class TrainService
     static List<Train> Trains { get; }
     static List<Carriage> _vagonsDogu { get; }
     static List<Carriage> _vagonsBaskent { get; }
-    static int nextId = 2;
+    static int nextId = 3;
     static TrainService()
     {
         _vagonsDogu = new List<Carriage>
